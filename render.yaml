@@ -1,0 +1,46 @@
+services:
+  # ---------------------------------------------------------------
+  # Backend — FastAPI (Python web service)
+  # ---------------------------------------------------------------
+  - type: web
+    name: student-dashboard-backend
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt && alembic upgrade head"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://student-dashboard-frontend.onrender.com
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ENVIRONMENT
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.12.0
+
+  # ---------------------------------------------------------------
+  # Frontend — React + Vite (Static Site)
+  # ---------------------------------------------------------------
+  - type: web
+    name: student-dashboard-frontend
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://student-dashboard-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
