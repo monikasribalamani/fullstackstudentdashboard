@@ -26,10 +26,8 @@ services:
   # ---------------------------------------------------------------
   # Frontend — React + Vite (Static Site)
   # ---------------------------------------------------------------
-  - type: web
+  - type: static
     name: student-dashboard-frontend
-    runtime: static
-    plan: free
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
