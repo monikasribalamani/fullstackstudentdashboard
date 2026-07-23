@@ -84,13 +84,14 @@ student-dashboard/
 ## Supabase Setup
 
 1. Go to [supabase.com](https://supabase.com) and create a new project.
-2. Once provisioned, open **Project Settings → Database → Connection string** and copy the **URI** (make sure "Use connection pooling" is off for migrations, or use the direct connection string).
-3. It will look like:
+2. Once provisioned, open **Project Settings → Database → Connection Pooling** and copy the **connection string** shown there (Transaction mode, port `6543`). It looks like:
    ```
-   postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?sslmode=require
+   postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
    ```
-4. Paste this into `DATABASE_URL` in your `.env` file (see below).
-5. The application does **not** use local SQLite — all environments (local, Docker, Render) connect directly to Supabase PostgreSQL.
+3. Paste this into `DATABASE_URL` in your `.env` file (see below).
+4. The application does **not** use local SQLite — all environments (local, Docker, Render) connect directly to Supabase PostgreSQL.
+
+> **Why the pooler and not the direct connection string?** Supabase's direct connection hostname (`db.[PROJECT-REF].supabase.co`) resolves to an **IPv6-only** address on new projects unless you pay for the IPv4 add-on. Platforms without outbound IPv6 support — Render's free tier included — will fail with `Network is unreachable`. The Connection Pooler endpoint is IPv4-reachable and is what Supabase recommends for exactly this situation (serverless/external platforms). It works fine for a normal SQLAlchemy connection pool too, including running Alembic migrations.
 
 ## Environment Variables
 
