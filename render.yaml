@@ -15,7 +15,7 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: CORS_ORIGINS
-        value: https://student-dashboard-frontend.onrender.com
+        sync: false
       - key: LOG_LEVEL
         value: INFO
       - key: ENVIRONMENT
@@ -34,7 +34,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://student-dashboard-backend.onrender.com
+        sync: false
     routes:
       - type: rewrite
         source: /*

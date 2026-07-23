@@ -246,10 +246,12 @@ This repository includes a ready-to-use [`render.yaml`](./render.yaml) Blueprint
 
 1. Push this repository to GitHub.
 2. In the [Render Dashboard](https://dashboard.render.com), click **New → Blueprint** and select your repository. Render will detect `render.yaml` automatically.
-3. When prompted, set the **`DATABASE_URL`** secret for the backend service to your Supabase connection string (it is marked `sync: false` in `render.yaml`, so Render will ask for it during setup).
+3. When prompted, set the **`DATABASE_URL`** secret for the backend service to your Supabase connection string — use the **Connection Pooler** string (Project Settings → Database → Connection Pooling → Transaction mode, port `6543`), not the direct connection string (see [Supabase Setup](#supabase-setup) for why).
 4. Click **Apply** — Render will build and deploy both services.
 5. The backend's health check is configured at `/api/health`, so Render will only route traffic once the database connection is confirmed.
-6. The frontend's `VITE_API_URL` and the backend's `CORS_ORIGINS` are pre-wired to each other's default Render hostnames (`https://student-dashboard-backend.onrender.com` and `https://student-dashboard-frontend.onrender.com`). If you rename the services in `render.yaml`, update these two values to match your new hostnames.
+6. **After both services are created**, Render assigns each one a URL — usually `https://<service-name>.onrender.com`, but if that exact subdomain is already taken by another Render user, it appends a random suffix (e.g. `https://student-dashboard-backend-9chq.onrender.com`). Because of this, `CORS_ORIGINS` (on the backend) and `VITE_API_URL` (on the frontend) are both marked `sync: false` in `render.yaml` rather than hardcoded — you must set them manually once you know the real URLs:
+   - Backend service → **Environment** tab → set `CORS_ORIGINS` to the frontend's actual URL.
+   - Frontend service → **Environment** tab → set `VITE_API_URL` to the backend's actual URL, then trigger a redeploy (Vite bakes this value in at build time, so a plain restart isn't enough — a rebuild is required).
 
 No source code changes are required after deployment — everything is driven by environment variables.
 
